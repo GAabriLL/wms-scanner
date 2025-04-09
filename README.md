@@ -10,7 +10,7 @@
 
 <ul>
   <li>✅ Cadastro de produtos com nome, categoria, quantidade e localização</li>
-  <li>✅ Leitura de QR Code pela câmera do navegador</li>
+  <li>✅ Leitura de QR Code pela câmera do navegador ou smartphone</li>
   <li>✅ Busca e visualização de produtos cadastrados</li>
   <li>✅ Interface web interativa e responsiva</li>
   <li>🔜 Integração com banco de dados</li>
