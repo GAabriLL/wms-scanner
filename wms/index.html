@@ -1,17 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WMS QR Scanner</title>
-  </head>
-  <body>
-    <h1>Leitor QR Code</h1>
 
-    <input type="text" id="codigoProduto" readonly placeholder="Código escaneado">
-    <div id="reader" style="width: 300px; margin-top: 20px;"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WMS QR Scanner</title>
+</head>
 
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<body>
+  <h1>Leitor QR Code</h1>
+
+  <input type="text" id="nome" placeholder="Nome do produto" />
+  <div id="reader" style="width: 300px;"></div>
+  <button onclick="iniciarLeitor()">Ler QR Code</button>
+
+  <h2>Cadastro Manual</h2>
+  <form id="form-produto">
+    <input type="text" id="nome" placeholder="Nome do produto" required />
+    <input type="text" id="codigo" placeholder="Código do produto" required />
+    <input type="number" id="quantidade" placeholder="Quantidade" required />
+    <input type="text" id="descricao" placeholder="Descrição" />
+    <input type="text" id="rua" placeholder="Rua (local)" />
+    <input type="text" id="nivel" placeholder="Nível (ex: A, B, C...)" />
+    <button type="submit">Cadastrar</button>
+  </form>
+  <p id="mensagem"></p>
+
+  <h2>Estoque cadastrado</h2>
+  <table border="1" id="tabela-produtos">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Código</th>
+        <th>Quantidade</th>
+        <th>Descrição</th>
+        <th>Rua</th>
+        <th>Nível</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script type="module">
+
+    const form = document.getElementById("form-produto");
+    const mensagem = document.getElementById("mensagem");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const nome = document.getElementById("nome").value;
+      const codigo = document.getElementById("codigo").value;
+      const quantidade = parseInt(document.getElementById("quantidade").value);
+      const descricao = document.getElementById("descricao").value;
+      const rua = document.getElementById("rua").value;
+      const nivel = document.getElementById("nivel").value;
+
+      const resposta = await fetch("http://localhost:3001/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, codigo, quantidade, descricao, rua, nivel }),
+      });
+
+      if (resposta.ok) {
+        mensagem.textContent = "✅ Produto cadastrado com sucesso!";
+        form.reset();
+        carregarProdutos(); // Atualiza a tabela
+      } else {
+        mensagem.textContent = "❌ Erro ao cadastrar o produto.";
+      }
+    });
+
+    async function carregarProdutos() {
+      const resposta = await fetch("http://localhost:3001/produtos");
+      const produtos = await resposta.json();
+
+      const tbody = document.querySelector("#tabela-produtos tbody");
+      tbody.innerHTML = "";
+
+      produtos.forEach((produto) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+      <td>${produto.id}</td>
+      <td>${produto.nome}</td>
+      <td>${produto.codigo}</td>
+      <td>${produto.quantidade}</td>
+      <td>${produto.descricao}</td>
+      <td>${produto.rua}</td>
+      <td>${produto.nivel}</td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
+    carregarProdutos();
+  </script>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
 
+<script type="module">
+  import { Html5Qrcode } from "html5-qrcode";
+
+  const iniciarLeitor = () => {
+    const qrCodeScanner = new Html5Qrcode("reader");
+
+    qrCodeScanner.start(
+      { facingMode: "environment" }, // câmera traseira
+      { fps: 10, qrbox: 250 },
+      async (decodedText) => {
+        console.log("Código lido:", decodedText);
+
+        const nome = document.getElementById("nome").value;
+        const codigo = decodedText;
+        const quantidade = 1; // ou permita o usuário escolher
+
+        // Envia pro backend
+        const resposta = await fetch("http://localhost:3001/produtos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nome, descricao, codigo_verificacao, rua, nivel, quantidade }),
+        });
+
+        if (resposta.ok) {
+          alert("Produto cadastrado com sucesso!");
+          qrCodeScanner.stop(); // para o scanner
+        } else {
+          alert("Erro ao cadastrar produto.");
+        }
+      },
+      (errorMessage) => {
+        console.warn("Erro de leitura:", errorMessage);
+      }
+    );
+  };
+</script>
