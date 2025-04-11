@@ -50,20 +50,36 @@ app.post("/produtos", (req, res) => {
   });
 });
 
+db.serialize(() => {
+  db.run(`
+    DBCC CHECKIDENT ('produtos', RESEED, 0)  
+  `);
+})
+
 /*
                       Rota para deletar todos os produtos -->
 ---(NOTA IMPORTANTE) reinicie a droga do servidor apos deletar o conteudo da tabela---
-
+*/
 app.delete("/produtos", (req, res) => {
-  db.run("DELETE FROM produtos", function (err) {
-    if (err) {
-      console.error("Erro ao deletar produtos:", err.message);
-      return res.status(500).json({ erro: err.message });
-    }
-    res.json({ mensagem: "Todos os produtos foram deletados com sucesso." });
+  db.serialize(() => {
+    db.run("DELETE FROM produtos", function (err) {
+      if (err) {
+        console.error("Erro ao deletar produtos:", err.message);
+        return res.status(500).json({ erro: err.message });
+      }
+
+      // Resetar o contador de ID
+      db.run("DELETE FROM sqlite_sequence WHERE name = 'produtos'", function (err2) {
+        if (err2) {
+          console.error("Erro ao resetar ID:", err2.message);
+          return res.status(500).json({ erro: err2.message });
+        }
+
+        res.json({ mensagem: "Todos os produtos foram deletados e IDs resetados." });
+      });
+    });
   });
 });
-*/
 
 
 // Rota para buscar todos os produtos

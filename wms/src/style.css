@@ -1,9 +1,9 @@
 :rote {
   --cor-background: #A6A6A6;
-  --cor-primaria: ;
+  /* --cor-primaria: ;
   --cor-secundaria: ;
-  --cor-terciaria: ; 
-  --cor-campo-texto: #A6A6A6; 
+  --cor-terciaria: ;  */
+  --cor-campo-texto: #d1e7dd; 
   --cor-botao: #1D8FF2; 
 }
 
@@ -15,7 +15,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  background-color: A6A6A6;
   color: #333;
   line-height: 1.6;
   padding: 20px;
