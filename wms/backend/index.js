@@ -15,9 +15,8 @@ app.listen(port, () => {
 const db = new sqlite3.Database("wms.db");
 
 db.serialize(() => {
-  db.run(`DROP TABLE IF EXISTS produtos`);
   db.run(`
-    CREATE TABLE produtos (
+    CREATE TABLE IF NOT EXISTS produtos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT,
       codigo TEXT,
@@ -50,12 +49,6 @@ app.post("/produtos", (req, res) => {
   });
 });
 
-db.serialize(() => {
-  db.run(`
-    DBCC CHECKIDENT ('produtos', RESEED, 0)  
-  `);
-})
-
 /*
                       Rota para deletar todos os produtos -->
 ---(NOTA IMPORTANTE) reinicie a droga do servidor apos deletar o conteudo da tabela---
@@ -78,6 +71,23 @@ app.delete("/produtos", (req, res) => {
         res.json({ mensagem: "Todos os produtos foram deletados e IDs resetados." });
       });
     });
+  });
+});
+
+// Rota para deletar um produto específico
+// Rota para deletar um produto específico
+app.delete("/produtos/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.run(`DELETE FROM produtos WHERE id = ?`, id, function (err) {
+    if (err) {
+      console.error("Erro ao deletar produto:", err.message);
+      return res.status(500).json({ erro: err.message });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ mensagem: "Produto não encontrado" });
+    }
+    res.json({ mensagem: "Produto deletado com sucesso" });
   });
 });
 
