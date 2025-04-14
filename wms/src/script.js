@@ -66,12 +66,11 @@ const iniciarLeitor = async () => {
 
                 const nome = document.getElementById("nome-qr").value;
                 const codigo = decodedText;
-                const quantidade = 1; // ou permita o usuário escolher
-                const descricao = ""; // Adicione lógica para obter descrição, se necessário
-                const rua = ""; // Adicione lógica para obter rua, se necessário
-                const nivel = ""; // Adicione lógica para obter nível, se necessário
+                const quantidade = 1;
+                const descricao = "";
+                const rua = "";
+                const nivel = "";
 
-                // Envia pro backend
                 const resposta = await fetch("http://localhost:3001/produtos", {
                     method: "POST",
                     headers: {
@@ -82,8 +81,8 @@ const iniciarLeitor = async () => {
 
                 if (resposta.ok) {
                     alert("Produto cadastrado com sucesso!");
-                    await qrCodeScanner.stop(); // para o scanner
-                    carregarProdutos(); // Atualiza a tabela
+                    await qrCodeScanner.stop();
+                    carregarProdutos(); 
                 } else {
                     alert("Erro ao cadastrar produto.");
                 }
@@ -106,18 +105,27 @@ window.deletarTodosProdutos = async function () {
         alert("Operação cancelada.");
         return;
     }
-    // Se o usuário confirmar, prossegue com a exclusão
     const confirmacao = await fetch("http://localhost:3001/produtos", {
         method: "DELETE",
     });
-    // Verifica se a resposta foi bem-sucedida  
     if (resposta.ok) {
         alert("Todos os produtos foram apagados!");
-        carregarProdutos(); // atualiza a tabela
+        carregarProdutos();
     } else {
         alert("Erro ao apagar os produtos.");
     }
 };
+
+document.getElementById("pesquisa").addEventListener("input", function () {
+    const termo = this.value.toLowerCase();
+    const linhas = document.querySelectorAll("#tabela-produtos tbody tr");
+
+    linhas.forEach((linha) => {
+        const nomeProduto = linha.children[1].textContent.toLowerCase(); // coluna 1 = nome
+        linha.style.display = nomeProduto.includes(termo) ? "" : "none";
+    });
+});
+
 
 window.deletarProdutoEspecifico = async function (id) {
     const resposta = await fetch(`http://localhost:3001/produtos/${id}`, {

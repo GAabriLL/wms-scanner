@@ -15,9 +15,7 @@
   <div class="mb-4">
     <label for="nome-qr" class="form-label">Nome do produto (QR)</label>
     <input type="text" id="nome-qr" class="form-control mb-2" placeholder="Nome do produto (QR)" />
-    <div id="reader" class="border p-3" style="width: 300px;">
       <button class="btn btn-primary mt-3" onclick="iniciarLeitor()">Ler QR Code</button>
-    </div>
   </div>
 
   <h2 class="mt-5">Cadastro Manual</h2>
@@ -68,7 +66,10 @@
   <p id="mensagem" class="mt-3"></p>
   <h2 class="mt-5">Estoque cadastrado</h2>
   <table class="table table-success table-striped table-bordered mt-3" id="tabela-produtos">
-    <input type="text" class="form-control" placeholder="Pesquisar por produto:" required />
+    <div class="d-flex">
+      <input type="text" id="pesquisa" class="form-control mb-3" placeholder="Pesquisar por nome do produto" />
+        <!-- <button class="btn btn-primary" id="surch" onclick="buscar()">Pesquisar</button> -->
+    </div>
     <thead class="table-success">
       <tr>
         <th>ID</th>

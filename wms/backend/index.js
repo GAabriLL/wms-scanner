@@ -49,10 +49,7 @@ app.post("/produtos", (req, res) => {
   });
 });
 
-/*
-                      Rota para deletar todos os produtos -->
----(NOTA IMPORTANTE) reinicie a droga do servidor apos deletar o conteudo da tabela---
-*/
+                      // Rota para deletar todos os produtos 
 app.delete("/produtos", (req, res) => {
   db.serialize(() => {
     db.run("DELETE FROM produtos", function (err) {
@@ -74,8 +71,6 @@ app.delete("/produtos", (req, res) => {
   });
 });
 
-// Rota para deletar um produto específico
-// Rota para deletar um produto específico
 app.delete("/produtos/:id", (req, res) => {
   const id = req.params.id;
 
@@ -88,6 +83,18 @@ app.delete("/produtos/:id", (req, res) => {
       return res.status(404).json({ mensagem: "Produto não encontrado" });
     }
     res.json({ mensagem: "Produto deletado com sucesso" });
+  });
+});
+
+app.get("/produtos/pesquisar", (req, res) => {
+  const nome = req.query.nome;
+
+  db.all("SELECT * FROM produtos WHERE nome LIKE ?", [`%${nome}%`], (err, rows) => {
+      if (err) {
+          res.status(500).json({ erro: err.message });
+      } else {
+          res.json(rows);
+      }
   });
 });
 
